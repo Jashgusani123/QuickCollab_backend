@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://quickcollab-frontend.onrender.com",
+    origin: "https://quickcollab-ten.vercel.app",
     credentials: true,
   })
 );
