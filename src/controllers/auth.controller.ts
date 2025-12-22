@@ -7,7 +7,7 @@ import type { CookieOptions } from "express";
 const COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "prod",
-  sameSite: (process.env.NODE_ENV === "prod" ? "strict" : "lax") as "strict" | "lax",
+  sameSite: (process.env.NODE_ENV === "prod" ? "none" : "lax") as "none" | "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
