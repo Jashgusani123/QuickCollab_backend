@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: true, // allow all origins dynamically
+    origin: "https://quickcollab-backend-5aqn.onrender.com", // allow all origins dynamically
     credentials: true,
   })
 );
