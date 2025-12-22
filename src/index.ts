@@ -38,7 +38,12 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ["http://localhost:3000" , "https://quickcollab-ten.vercel.app"], credentials: true }));
+app.use(
+  cors({
+    origin: true, // allow all origins dynamically
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
@@ -51,3 +56,4 @@ app.use("/api/conversations", conversationRoutes);
 app.listen(process.env.PORT, () =>
     console.log(`✅ Server running on port ${process.env.PORT}`)
 );
+export default app;
