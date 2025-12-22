@@ -2,6 +2,13 @@ import type { Request, Response } from "express";
 import { User } from "../models/user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import type { CookieOptions } from "express";
+
+const COOKIE_OPTIONS: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "prod",
+  sameSite: (process.env.NODE_ENV === "prod" ? "strict" : "lax") as "strict" | "lax",
+};
 
 export const createUser = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -11,33 +18,32 @@ export const createUser = async (req: Request, res: Response) => {
 
   const hashed = await bcrypt.hash(password, 10);
   const user = await User.create({ name, email, password: hashed });
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
-  res.cookie("token", token, { httpOnly: true, secure: false }).json({ message: "Account created", user });
-}
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+
+  res.cookie("token", token, COOKIE_OPTIONS).json({ message: "Account created", user });
+};
 
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
-
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
 
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({ message: "Logged in", user });
+    res.cookie("token", token, COOKIE_OPTIONS).json({ message: "Logged in", user });
   } catch (error) {
     console.log(error, " At the Login");
-    return;
-
+    return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const logoutUser = (req: Request, res: Response) => {
-  res.clearCookie("token").json({ message: "Logged out" });
-}
+  res.clearCookie("token", COOKIE_OPTIONS).json({ message: "Logged out" });
+};
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -53,10 +59,7 @@ export const getUser = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    return res.status(200).json({
-      success: true,
-      user,
-    });
+    return res.status(200).json({ success: true, user });
   } catch (error) {
     console.error("getUser error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
