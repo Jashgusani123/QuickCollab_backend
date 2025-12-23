@@ -40,7 +40,6 @@ export const createMessage = async (req: Request, res: Response) => {
     if (!member) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    console.log(parentMessageId);
 
     let _conversationId = conversationId;
     if (!conversationId && !channelId && parentMessageId) {
@@ -64,7 +63,6 @@ export const createMessage = async (req: Request, res: Response) => {
       imageUrl: null,
       imagePublicId: null,
     };
-    console.log(msgObj);
 
     // Upload image if provided
     if (imageFile) {

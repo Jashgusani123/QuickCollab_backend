@@ -12,6 +12,7 @@ import channelRoutes from "./routes/channel.route";
 import messageRoutes from "./routes/message.route";
 import reactionRoutes from "./routes/reaction.route";
 import conversationRoutes from "./routes/conversation.route";
+import adminRoutes from "./routes/admin.route";
 
 dotenv.config();
 connectDB();
@@ -40,7 +41,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://quickcollab-ten.vercel.app",
+    origin: ["http://localhost:3000","https://quickcollab-ten.vercel.app"],
     credentials: true,
   })
 );
@@ -52,6 +53,7 @@ app.use("/api/channels", channelRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reactions", reactionRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(process.env.PORT, () =>
     console.log(`✅ Server running on port ${process.env.PORT}`)

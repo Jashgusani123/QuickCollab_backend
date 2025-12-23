@@ -21,7 +21,7 @@ export const createUser = async (req: Request, res: Response) => {
   const user = await User.create({ name, email, password: hashed });
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
 
-  res.cookie("token", token, COOKIE_OPTIONS).json({ message: "Account created", user });
+  res.status(201).json({ message: "Account created", user , token});
 };
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
 
-    res.cookie("token", token, COOKIE_OPTIONS).json({ message: "Logged in", user });
+    res.status(200).json({ message: "Logged in", user, token });
   } catch (error) {
     console.log(error, " At the Login");
     return res.status(500).json({ message: "Internal server error" });
