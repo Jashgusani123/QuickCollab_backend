@@ -18,6 +18,8 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.set("trust proxy", 1);
+
 morgan.token("statusColor", (req: any, res: any) => {
     const status = res.statusCode;
     if (status >= 500) return chalk.red(status);
@@ -41,10 +43,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000","https://quickcollab-ten.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://quickcollab-ten.vercel.app",
+    ],
     credentials: true,
   })
 );
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);

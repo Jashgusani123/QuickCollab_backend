@@ -6,8 +6,8 @@ import type { CookieOptions } from "express";
 
 const COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
-  secure: true,
-  sameSite: "none",
+  secure: true, // REQUIRED on Render (HTTPS)
+  sameSite: "none", // REQUIRED for Vercel → Render
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
@@ -19,9 +19,14 @@ export const createUser = async (req: Request, res: Response) => {
 
   const hashed = await bcrypt.hash(password, 10);
   const user = await User.create({ name, email, password: hashed });
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
+    expiresIn: "7d",
+  });
 
-  res.status(201).json({ message: "Account created", user , token});
+  res.cookie("token", token, COOKIE_OPTIONS).status(201).json({
+    message: "Account created",
+    user,
+  });
 };
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -33,9 +38,14 @@ export const loginUser = async (req: Request, res: Response) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
 
-    res.status(200).json({ message: "Logged in", user, token });
+    res.cookie("token", token, COOKIE_OPTIONS).status(200).json({
+      message: "Logged in",
+      user,
+    });
   } catch (error) {
     console.log(error, " At the Login");
     return res.status(500).json({ message: "Internal server error" });
@@ -57,12 +67,16 @@ export const getUser = async (req: Request, res: Response) => {
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     return res.status(200).json({ success: true, user });
   } catch (error) {
     console.error("getUser error:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
