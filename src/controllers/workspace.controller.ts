@@ -20,7 +20,7 @@ export const createWorkspace = async (req: Request, res: Response) => {
       role: "admin"
     });
     await Channel.create({
-      name: "General",
+      name: "general",
       workspaceId: workspace._id
     })
     res.status(201).json({ success: true, workspaceId: workspace._id, message: "Workspace created !!" });
