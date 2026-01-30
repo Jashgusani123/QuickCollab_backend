@@ -244,6 +244,7 @@ export const getMessages = async (req: Request, res: Response) => {
             id: user._id,
             name: user.name,
             email: user.email,
+            image:user.image || null,
           },
 
           reactions: reactionsMerged,
