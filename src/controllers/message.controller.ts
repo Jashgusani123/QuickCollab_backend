@@ -55,7 +55,7 @@ export const createMessage = async (req: Request, res: Response) => {
 
     const msgObj: any = {
       body,
-      channelId: channelId || null,
+      channelId: channelId && channelId !== "undefined" ? channelId : null,
       workspaceId,
       memberId: member._id,
       parentMessageId: parentMessageId || null,
@@ -73,7 +73,7 @@ export const createMessage = async (req: Request, res: Response) => {
             (err, result) => {
               if (err) return reject(err);
               resolve(result);
-            }
+            },
           )
           .end(imageFile.buffer);
       });
@@ -116,7 +116,7 @@ export const createMessage = async (req: Request, res: Response) => {
     const thread = await populateThread(savedMessage._id as ObjectId);
 
     const formattedMessage = {
-      channelId,
+      channelId: channelId || null,
       id: savedMessage._id,
       workspaceId: savedMessage.workspaceId,
       body: savedMessage.body,
@@ -183,10 +183,10 @@ export const getMessages = async (req: Request, res: Response) => {
       conditions.parentMessageId = null;
     }
 
-    // CHANNEL messages 
+    // CHANNEL messages
     else if (channelId) {
       conditions.channelId = channelId;
-      conditions.parentMessageId = null; 
+      conditions.parentMessageId = null;
     }
 
     if (!channelId && !conversationId && !parentMessageId) {
@@ -199,14 +199,14 @@ export const getMessages = async (req: Request, res: Response) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     const rawMessages = await MessageModel.find(conditions)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .skip(skip)
       .limit(Number(limit));
-
+    const orderedMessages = rawMessages.reverse();
     const total = await MessageModel.countDocuments(conditions);
 
     const messages = await Promise.all(
-      rawMessages.map(async (message) => {
+      orderedMessages.map(async (message) => {
         const member = await populateMember(message.memberId);
         if (!member) return null;
 
@@ -244,7 +244,7 @@ export const getMessages = async (req: Request, res: Response) => {
             id: user._id,
             name: user.name,
             email: user.email,
-            image:user.image || null,
+            image: user.image || null,
           },
 
           reactions: reactionsMerged,
@@ -252,12 +252,13 @@ export const getMessages = async (req: Request, res: Response) => {
           threadCount: thread.count,
           threadImage: thread.image || null,
           threadTimestamp: thread.timestamp,
+          threadName: thread.name || null,
 
           createdAt: message.createdAt,
           updatedAt:
             message.updatedAt > message.createdAt ? message.updatedAt : null,
         };
-      })
+      }),
     );
 
     const cleaned = messages.filter((m) => m !== null);

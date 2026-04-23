@@ -8,7 +8,8 @@ import { timeStamp } from "console";
 export const generateCode = () => {
   const code = Array.from(
     { length: 6 },
-    () => "0123456789abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 36)]
+    () =>
+      "0123456789abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 36)],
   ).join("");
   return code;
 };
@@ -32,30 +33,32 @@ export const populateReactions = (messageId: ObjectId) => {
 export const populateThread = async (messageId: ObjectId) => {
   const messages = await MessageModel.find({ parentMessageId: messageId });
 
-  if(messages.length  === 0){
+  if (messages.length === 0) {
     return {
-      count : 0,
+      count: 0,
       image: undefined,
-      timestamp:0
-    }
+      timestamp: 0,
+    };
   }
 
-  const lastMessage = messages[messages.length -1];
+  const lastMessage = messages[messages.length - 1];
   const lastMessageMember = await populateMember(lastMessage.memberId);
 
-  if(!lastMessageMember){
+  if (!lastMessageMember) {
     return {
-      count:0,
-      image:undefined,
-      timestamp:0
-    }
+      count: 0,
+      image: undefined,
+      timestamp: 0,
+      name:""
+    };
   }
 
-await populateUser(lastMessageMember.userId);
+ const lastUser = await populateUser(lastMessageMember.userId);
+ 
   return {
-    count:messages.length,
-    image:lastMessage.imageUrl, 
-    timestamp:lastMessage.createdAt
-  }
-
+    count: messages.length,
+    image: lastUser?.image,
+    name: lastUser?.name || "",
+    timestamp: lastMessage.createdAt,
+  };
 };
