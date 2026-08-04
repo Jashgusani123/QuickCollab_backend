@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { createUser, getUser, loginUser, logoutUser } from "../controllers/auth.controller";
+import { createUser, getUnreadCounts, getUser, loginUser, logoutUser } from "../controllers/auth.controller";
 import { auth } from "../middlewares/auth.middleware";
 
 const router = Router();
@@ -16,5 +16,8 @@ router.post("/logout", logoutUser);
 
 // get user
 router.get("/me", auth , getUser);
+
+// get user
+router.post("/me/unread-counts", auth , getUnreadCounts);
 
 export default router;

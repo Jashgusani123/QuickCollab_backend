@@ -4,6 +4,7 @@ export interface IMember extends Document {
   workspaceId: ObjectId;
   userId: ObjectId;
   role: "admin" | "member";
+  lastReadAt: Date;
   // _id:ObjectId
 }
 
@@ -17,6 +18,10 @@ const MemberSchema = new mongoose.Schema<IMember>(
       default: "member",
       required: true,
     },
+    lastReadAt: {
+      type: Date,
+      default: null,
+    }
   },
   { timestamps: true }
 );

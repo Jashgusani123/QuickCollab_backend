@@ -118,3 +118,50 @@ export const getMemberById = async (req: Request, res: Response) => {
     });
   }
 }
+
+export const newMember = async (req: Request, res: Response) => {
+  try{
+    const { memberId } = req.body;
+    const userId = (req as any).user.id;
+
+    if (!userId || !memberId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request",
+        member: null,
+      });
+    }
+
+    // Check if user is a member
+    const member = await Member.findOne({ userId });
+    if (!member) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+        member: null,
+      });
+    }
+
+    const targetMember = await Member.findById(memberId);
+
+    if (!targetMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found",
+        member: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      member: {...targetMember , user: await populateUser(targetMember.userId as ObjectId)},
+    });
+
+  }catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
