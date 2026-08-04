@@ -9,7 +9,6 @@ import { connectDB } from "./config/database";
 import routes from "./routes/routes";
 import { User } from "./models/user.model";
 
-
 dotenv.config();
 connectDB();
 
@@ -21,7 +20,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://quickcollab-ten.vercel.app"],
+    origin: ["http://localhost:3000", "https://quickcollab-ten.vercel.app", "https://prolonged-trinity-family.ngrok-free.dev"],
     credentials: true,
   })
 );
