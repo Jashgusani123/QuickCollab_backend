@@ -7,10 +7,9 @@ import morgan from "morgan";
 import jwt from "jsonwebtoken";
 import { connectDB } from "./config/database";
 import routes from "./routes/routes";
-import dns from "dns";
 import { User } from "./models/user.model";
 
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 dotenv.config();
 connectDB();
 
