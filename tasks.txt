@@ -1,0 +1,4 @@
+Create Friend REQUEST and ACCEPT things and Implement it.
+handle types of REQUEST
+
+Manage Notifications ( In Chat and Other mejor notifications )
